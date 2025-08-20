@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .correct {
+            background-color: #22c55e !important; /* green-500 */
+            color: white !important;
+            border-color: #16a34a !important; /* green-600 */
+        }
+        .incorrect {
+            background-color: #ef4444 !important; /* red-500 */
+            color: white !important;
+            border-color: #dc2626 !important; /* red-600 */
+        }
+        .disabled-options .option-btn {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-2xl mx-auto">
+        
+        <!-- Pantalla de Inicio -->
+        <div id="start-screen" class="text-center bg-white p-8 rounded-2xl shadow-lg">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">El Arte de Hablar con la IA</h1>
+            <p class="text-slate-600 mb-2">Una introducción a la Ingeniería de Contexto para Agentes Inmobiliarios.</p>
+            <p class="text-slate-600 mb-8">Pon a prueba tus conocimientos y conviértete en un arquitecto de sistemas de IA.</p>
+            <button id="start-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+                Comenzar Entrenamiento
+            </button>
+        </div>
+
+        <!-- Pantalla del Juego -->
+        <div id="quiz-screen" class="hidden">
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                <!-- Barra de Progreso y Puntuación -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 mr-4">
+                        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-slate-500">Puntuación</p>
+                        <p id="score" class="text-xl font-bold text-slate-900">0</p>
+                    </div>
+                </div>
+
+                <!-- Pregunta -->
+                <div class="mb-6">
+                    <p class="text-sm font-semibold text-blue-600 mb-1" id="question-counter"></p>
+                    <h2 id="question-text" class="text-xl md:text-2xl font-semibold text-slate-800"></h2>
+                </div>
+
+                <!-- Opciones -->
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Las opciones se generarán aquí -->
+                </div>
+                
+                <!-- Botón Siguiente -->
+                <div class="mt-8 text-right">
+                    <button id="next-btn" class="bg-slate-800 text-white font-bold py-2 px-8 rounded-lg hover:bg-slate-900 transition-colors shadow-sm hidden">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla Final -->
+        <div id="end-screen" class="hidden text-center bg-white p-8 rounded-2xl shadow-lg">
+            <div id="result-icon" class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center text-white text-4xl">
+                <!-- Icono cambiará con JS -->
+            </div>
+            <h2 id="result-title" class="text-3xl font-bold text-slate-900 mb-2">¡Entrenamiento Completado!</h2>
+            <p class="text-slate-600 mb-4">Tu puntuación final es:</p>
+            <p id="final-score" class="text-6xl font-bold text-slate-900 mb-6"></p>
+            <p id="result-message" class="text-slate-700 mb-8 max-w-md mx-auto"></p>
+            <button id="restart-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+                Intentar de Nuevo
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- CONTENIDO DEL CUESTIONARIO ---
+        const quizData = [
+            {
+                question: "¿Qué es la Ingeniería de Contexto en comparación con la Ingeniería de Prompts?",
+                options: [
+                    "Es hacer una única pregunta brillante a la IA.",
+                    "Es la estrategia integral que considera todo lo que la IA sabe para responder.",
+                    "Es el historial de la conversación con la IA.",
+                    "Es darle una personalidad a la IA."
+                ],
+                answer: 1
+            },
+            {
+                question: "¿Qué representa la 'ventana de contexto' de una IA?",
+                options: [
+                    "La memoria a largo plazo de la IA.",
+                    "Su capacidad para buscar en internet.",
+                    "Su 'escritorio de trabajo' o memoria a corto plazo con la información actual.",
+                    "El formato en que entrega la respuesta."
+                ],
+                answer: 2
+            },
+            {
+                question: "¿Cuál de estos NO es un componente clave de la Ingeniería de Contexto?",
+                options: [
+                    "Prompt del Sistema.",
+                    "Generación Aumentada por Recuperación (RAG).",
+                    "El modelo de la computadora del usuario.",
+                    "Herramientas Disponibles."
+                ],
+                answer: 2
+            },
+            {
+                question: "¿Para qué sirve el 'Prompt del Sistema'?",
+                options: [
+                    "Para recordar conversaciones pasadas.",
+                    "Para darle una personalidad y un rol a la IA.",
+                    "Para acceder a documentos externos.",
+                    "Para pedir la respuesta en un formato específico."
+                ],
+                answer: 1
+            },
+            {
+                question: "¿Qué permite la técnica 'Generación Aumentada por Recuperación' (RAG)?",
+                options: [
+                    "Que la IA realice acciones como agendar citas.",
+                    "Que la IA 'piense paso a paso'.",
+                    "Darle a la IA acceso a documentos y bases de datos externas en tiempo real.",
+                    "Darle a la IA ejemplos de entrada y salida."
+                ],
+                answer: 2
+            },
+            {
+                question: "¿Cuál es uno de los principales beneficios de usar la Ingeniería de Contexto?",
+                options: [
+                    "Hacer que la IA responda más rápido.",
+                    "Obtener resultados mucho más precisos y relevantes.",
+                    "Reducir el costo de usar la IA.",
+                    "Usar la IA sin conexión a internet."
+                ],
+                answer: 1
+            },
+            {
+                question: "Según el texto, ¿qué efecto puede tener agregar frases con emociones como 'Esto es muy importante para mi carrera'?",
+                options: [
+                    "Puede confundir a la IA.",
+                    "No tiene ningún efecto en el resultado.",
+                    "Puede mejorar el rendimiento de la IA, especialmente en tareas complejas.",
+                    "Solo funciona en modelos de IA específicos."
+                ],
+                answer: 2
+            },
+            {
+                question: "¿Qué es un sistema 'multiagente', según la visión a futuro presentada en el texto?",
+                options: [
+                    "Una única IA superpotente que lo sabe todo.",
+                    "Equipos de agentes de IA especializados que colaboran en tareas complejas.",
+                    "Un sistema donde muchos usuarios usan la misma IA.",
+                    "Una IA que puede hablar en múltiples idiomas."
+                ],
+                answer: 1
+            }
+        ];
+
+        // --- ELEMENTOS DEL DOM ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const scoreEl = document.getElementById('score');
+        const questionCounter = document.getElementById('question-counter');
+
+        const finalScore = document.getElementById('final-score');
+        const resultMessage = document.getElementById('result-message');
+        const resultTitle = document.getElementById('result-title');
+        const resultIcon = document.getElementById('result-icon');
+
+        // --- ESTADO DEL JUEGO ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        // --- FUNCIONES DEL JUEGO ---
+
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            updateScore();
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionText.innerText = currentQuestion.question;
+            questionCounter.innerText = `Pregunta ${currentQuestionIndex + 1} de ${quizData.length}`;
+            
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('option-btn', 'w-full', 'text-left', 'p-4', 'rounded-lg', 'border-2', 'border-slate-200', 'bg-slate-50', 'hover:bg-slate-100', 'hover:border-blue-400');
+                button.dataset.index = index;
+                button.addEventListener('click', selectAnswer);
+                optionsContainer.appendChild(button);
+            });
+
+            updateProgressBar();
+        }
+
+        function resetState() {
+            nextBtn.classList.add('hidden');
+            optionsContainer.innerHTML = '';
+            optionsContainer.classList.remove('disabled-options');
+        }
+
+        function selectAnswer(e) {
+            const selectedBtn = e.target;
+            const correctIndex = quizData[currentQuestionIndex].answer;
+            const selectedIndex = parseInt(selectedBtn.dataset.index);
+
+            optionsContainer.classList.add('disabled-options');
+
+            if (selectedIndex === correctIndex) {
+                selectedBtn.classList.add('correct');
+                score += 10;
+                updateScore();
+            } else {
+                selectedBtn.classList.add('incorrect');
+                // Muestra la respuesta correcta si se equivocó
+                const correctBtn = optionsContainer.querySelector(`[data-index='${correctIndex}']`);
+                correctBtn.classList.add('correct');
+            }
+
+            nextBtn.classList.remove('hidden');
+        }
+
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                showQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function updateScore() {
+            scoreEl.innerText = score;
+        }
+
+        function updateProgressBar() {
+            const progressPercentage = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function endGame() {
+            updateProgressBar(); // Para que llegue al 100%
+            quizScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScore.innerText = score;
+
+            const percentage = (score / (quizData.length * 10)) * 100;
+
+            if (percentage >= 80) {
+                resultIcon.innerHTML = '🏆';
+                resultIcon.className += ' bg-amber-400';
+                resultTitle.innerText = '¡Excelente Trabajo!';
+                resultMessage.innerText = '¡Felicidades! Has demostrado un gran entendimiento. Estás listo para aplicar estas técnicas y sacar el máximo provecho a la IA en tu trabajo.';
+            } else if (percentage >= 50) {
+                resultIcon.innerHTML = '👍';
+                resultIcon.className += ' bg-green-500';
+                resultTitle.innerText = '¡Buen Esfuerzo!';
+                resultMessage.innerText = 'Vas por muy buen camino. Repasa los conceptos clave y vuelve a intentarlo para afianzar tus conocimientos. ¡La práctica hace al maestro!';
+            } else {
+                resultIcon.innerHTML = '🧠';
+                resultIcon.className += ' bg-blue-500';
+                resultTitle.innerText = '¡Sigue Aprendiendo!';
+                resultMessage.innerText = 'El primer paso es el más importante. Cada intento es una oportunidad de aprender. ¡No te rindas y verás cómo mejoras rápidamente!';
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        startBtn.addEventListener('click', startGame);
+        nextBtn.addEventListener('click', showNextQuestion);
+        restartBtn.addEventListener('click', startGame);
+
+    </script>
+</body>
+</html>
