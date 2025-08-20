@@ -1,0 +1,237 @@
+<h1>👋 Hello World!</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador: Prompt Inmobiliario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .card-enter {
+            animation: card-enter 0.5s ease-out;
+        }
+        @keyframes card-enter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Custom scrollbar for better aesthetics */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+
+        <!-- Columna de Desafío (Izquierda) -->
+        <div class="lg:col-span-4">
+            <div id="challenge-container" class="bg-gray-50 p-6 rounded-xl h-full flex flex-col">
+                <div class="flex items-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#4f46e5" viewBox="0 0 256 256"><path d="M140,132a12,12,0,1,1-12-12A12,12,0,0,1,140,132Zm48-60v96a20,20,0,0,1-20,20H88a20,20,0,0,1-20-20V72a20,20,0,0,1,20-20h80A20,20,0,0,1,188,72Zm-20,0H88v96h80ZM212,60a20,20,0,0,0-20-20H64a8,8,0,0,0,0,16h8V200H48a8,8,0,0,0,0,16H180a8,8,0,0,0,0-16h-8V188h16a20,20,0,0,0,20-20V60Z"></path></svg>
+                    <h2 class="text-xl font-bold text-gray-800 ml-2">Desafío Actual</h2>
+                </div>
+                <div id="challenge-content">
+                    <!-- El contenido del desafío se cargará aquí -->
+                </div>
+                 <div class="mt-auto pt-4">
+                    <button id="next-challenge-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center">
+                        Siguiente Desafío
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="ml-2" viewBox="0 0 256 256"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.49a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Central: Editor de Prompt -->
+        <div class="lg:col-span-4">
+            <div class="bg-white h-full flex flex-col">
+                 <div class="flex items-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#10b981" viewBox="0 0 256 256"><path d="M216,40H40A20,20,0,0,0,20,60V176a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V60A20,20,0,0,0,216,40Zm0,156H40a4,4,0,0,1-4-4V60a4,4,0,0,1,4-4H216a4,4,0,0,1,4,4V176A4,4,0,0,1,216,196ZM68,100a12,12,0,1,1-12-12A12,12,0,0,1,68,100Zm36-12a12,12,0,1,0,12,12A12,12,0,0,0,104,88Zm48,0a12,12,0,1,0,12,12A12,12,0,0,0,152,88Zm48,0a12,12,0,1,0,12,12A12,12,0,0,0,200,88Z"></path></svg>
+                    <h2 class="text-xl font-bold text-gray-800 ml-2">Tu Prompt</h2>
+                </div>
+                <textarea id="prompt-input" class="w-full flex-grow bg-gray-100 border-2 border-gray-200 rounded-xl p-4 text-gray-700 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition" placeholder="Escribe tu prompt aquí..."></textarea>
+                <button id="evaluate-btn" class="w-full mt-4 bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-600 transition-colors duration-300 flex items-center justify-center">
+                    Calificar Prompt
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="ml-2" viewBox="0 0 256 256"><path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm54.43-110.1-80-56a12,12,0,0,0-12.86,21L144.9,128,89.57,152.1a12,12,0,1,0,12.86,21l80-56a12,12,0,0,0,0-21Z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Columna de Evaluación (Derecha) -->
+        <div class="lg:col-span-4">
+            <div id="evaluation-container" class="bg-gray-50 p-6 rounded-xl h-full">
+                <div class="flex items-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ef4444" viewBox="0 0 256 256"><path d="M228,96a12,12,0,0,0-12,12v64a12,12,0,0,0,24,0V108A12,12,0,0,0,228,96Zm-44,12a12,12,0,0,0-12-12,12,12,0,0,0-12,12v64a12,12,0,0,0,24,0Zm-48,28a12,12,0,0,0-12-12,12,12,0,0,0-12,12v36a12,12,0,0,0,24,0Zm-48-40a12,12,0,0,0-12-12,12,12,0,0,0-12,12v76a12,12,0,0,0,24,0ZM40,84A12,12,0,0,0,28,96v64a12,12,0,0,0,24,0V96A12,12,0,0,0,40,84Z"></path></svg>
+                    <h2 class="text-xl font-bold text-gray-800 ml-2">Evaluación</h2>
+                </div>
+                <div id="evaluation-content" class="text-center text-gray-500 flex flex-col justify-center items-center h-full">
+                    <p class="italic">Completa un desafío y califica tu prompt para ver los resultados aquí.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const challenges = [
+            {
+                title: "Descripción para Instagram",
+                situation: "Acabas de captar un moderno loft de 2 ambientes en Palermo Hollywood, ideal para jóvenes profesionales. El edificio tiene pileta y SUM.",
+                objective: "Generar un texto para un post de Instagram que sea atractivo, fresco y que destaque los 'amenities'.",
+                criteria: {
+                    persona: { keyword: /actúa|rol|copywriter|experto|inmobiliario/i, score: 20, tip: "Define un rol para la IA (ej: 'Actúa como un copywriter experto')." },
+                    context: { keyword: /loft|palermo hollywood|2 ambientes|jóvenes|profesionales/i, score: 30, tip: "Incluye detalles clave del inmueble y el público objetivo." },
+                    instruction: { keyword: /destaca|resalta|menciona|amenities|pileta|sum/i, score: 30, tip: "Da una instrucción clara sobre qué enfatizar (ej: 'Destaca los amenities')." },
+                    format: { keyword: /instagram|post|texto|emojis|hashtags/i, score: 20, tip: "Especifica el formato de salida (ej: 'en formato de post de Instagram con emojis y hashtags')." }
+                },
+                improvedPrompt: "Actúa como un copywriter experto en el sector inmobiliario. Crea un texto para un post de Instagram sobre un loft de 2 ambientes en Palermo Hollywood, dirigido a jóvenes profesionales. El texto debe ser fresco y atractivo, destacar que el edificio cuenta con pileta y SUM. Incluye emojis y 3 hashtags relevantes."
+            },
+            {
+                title: "Email de Captación",
+                situation: "Quieres contactar a propietarios de una zona específica (ej: Caballito) para ofrecer tus servicios de tasación y venta.",
+                objective: "Escribir un prompt para generar un email persuasivo y profesional que no suene a spam.",
+                criteria: {
+                    persona: { keyword: /agente inmobiliario|profesional|experto/i, score: 20, tip: "Define tu rol profesional en el prompt." },
+                    context: { keyword: /propietarios|caballito|ofrecer|servicios|tasación/i, score: 30, tip: "Aporta contexto: a quién te diriges y qué ofreces." },
+                    instruction: { keyword: /persuasivo|profesional|cercano|confianza|no spam|beneficios/i, score: 30, tip: "Especifica el tono y el objetivo del email (ej: 'que genere confianza')." },
+                    format: { keyword: /email|correo electrónico|asunto|cuerpo/i, score: 20, tip: "Pide explícitamente un formato de email con asunto y cuerpo." }
+                },
+                improvedPrompt: "Actúa como un agente inmobiliario con 10 años de experiencia. Redacta un correo electrónico para propietarios en el barrio de Caballito. El objetivo es ofrecer mis servicios de tasación profesional y venta. El tono debe ser cercano pero muy profesional, destacando los beneficios de trabajar conmigo y sin que parezca spam. Genera un asunto (subject) llamativo y el cuerpo del email."
+            },
+            {
+                title: "Guion para Video-Tour",
+                situation: "Vas a grabar un video recorriendo una casa de 4 ambientes con jardín y quincho en un barrio cerrado de Pilar.",
+                objective: "Crear un guion para un video de 1 minuto que sea dinámico y que resalte los puntos fuertes de la propiedad para una familia.",
+                criteria: {
+                    persona: { keyword: /presentador|conductor|agente/i, score: 20, tip: "Indica el rol de quien hablará en el video." },
+                    context: { keyword: /casa|4 ambientes|jardín|quincho|pilar|familia/i, score: 30, tip: "Describe la propiedad y el público objetivo (familias)." },
+                    instruction: { keyword: /dinámico|emotivo|puntos fuertes|recorrido|minuto/i, score: 30, tip: "Pide un guion que sea dinámico y se enfoque en los puntos clave." },
+                    format: { keyword: /guion|script|video|escenas|columnas/i, score: 20, tip: "Solicita un formato de guion, quizás dividido por escenas o en dos columnas (visual/audio)." }
+                },
+                improvedPrompt: "Actúa como el presentador de un tour inmobiliario. Crea un guion para un video de 1 minuto de una casa de 4 ambientes con jardín y quincho en Pilar, ideal para una familia. El guion debe ser dinámico y emotivo, resaltando los espacios para disfrutar en familia. Estructura el guion en una tabla con dos columnas: 'Escena/Visual' y 'Diálogo del Presentador'."
+            }
+        ];
+
+        let currentChallengeIndex = 0;
+
+        const challengeContentEl = document.getElementById('challenge-content');
+        const promptInputEl = document.getElementById('prompt-input');
+        const evaluateBtn = document.getElementById('evaluate-btn');
+        const nextChallengeBtn = document.getElementById('next-challenge-btn');
+        const evaluationContentEl = document.getElementById('evaluation-content');
+
+        function loadChallenge(index) {
+            const challenge = challenges[index];
+            challengeContentEl.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">${challenge.title}</h3>
+                <p class="text-sm text-gray-600 mb-3"><strong class="font-semibold">Situación:</strong> ${challenge.situation}</p>
+                <p class="text-sm text-gray-600"><strong class="font-semibold">Objetivo:</strong> ${challenge.objective}</p>
+            `;
+            promptInputEl.value = '';
+            evaluationContentEl.innerHTML = `
+                <div class="text-center text-gray-500 flex flex-col justify-center items-center h-full">
+                    <p class="italic">Completa un desafío y califica tu prompt para ver los resultados aquí.</p>
+                </div>
+            `;
+            challengeContentEl.closest('#challenge-container').classList.remove('card-enter');
+            void challengeContentEl.closest('#challenge-container').offsetWidth; // Trigger reflow
+            challengeContentEl.closest('#challenge-container').classList.add('card-enter');
+        }
+
+        function evaluatePrompt() {
+            const userPrompt = promptInputEl.value;
+            if (!userPrompt.trim()) {
+                evaluationContentEl.innerHTML = `<p class="text-red-500 font-semibold">Por favor, escribe un prompt antes de calificar.</p>`;
+                return;
+            }
+
+            const challenge = challenges[currentChallengeIndex];
+            let totalScore = 0;
+            let feedbackHTML = '<ul class="space-y-3 text-left">';
+
+            for (const key in challenge.criteria) {
+                const criterion = challenge.criteria[key];
+                if (criterion.keyword.test(userPrompt)) {
+                    totalScore += criterion.score;
+                    feedbackHTML += `
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <div>
+                                <strong class="text-gray-800">${key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
+                                <span class="text-gray-600">¡Bien! Aportaste ${key}.</span>
+                            </div>
+                        </li>`;
+                } else {
+                    feedbackHTML += `
+                        <li class="flex items-start">
+                           <svg class="w-5 h-5 text-yellow-500 mr-2 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <div>
+                                <strong class="text-gray-800">${key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
+                                <span class="text-gray-600">${criterion.tip}</span>
+                            </div>
+                        </li>`;
+                }
+            }
+            feedbackHTML += '</ul>';
+
+            let scoreColor = 'text-red-500';
+            if (totalScore >= 80) scoreColor = 'text-green-500';
+            else if (totalScore >= 50) scoreColor = 'text-yellow-500';
+
+            evaluationContentEl.innerHTML = `
+                <div class="card-enter w-full">
+                    <div class="text-center mb-4">
+                        <p class="text-lg font-medium text-gray-700">Puntaje Obtenido</p>
+                        <p class="text-6xl font-bold ${scoreColor}">${totalScore}<span class="text-3xl text-gray-400">/100</span></p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-800 mb-2 text-left">Análisis del Prompt:</h4>
+                        ${feedbackHTML}
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2 text-left">Sugerencia de Prompt Mejorado:</h4>
+                        <div class="bg-indigo-100 text-indigo-800 p-3 rounded-lg text-sm text-left italic">
+                            ${challenge.improvedPrompt}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        evaluateBtn.addEventListener('click', evaluatePrompt);
+        nextChallengeBtn.addEventListener('click', () => {
+            currentChallengeIndex = (currentChallengeIndex + 1) % challenges.length;
+            loadChallenge(currentChallengeIndex);
+        });
+
+        // Carga inicial
+        loadChallenge(currentChallengeIndex);
+    </script>
+</body>
+</html>
